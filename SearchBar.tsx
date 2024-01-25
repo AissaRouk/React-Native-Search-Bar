@@ -1,121 +1,206 @@
-import { useEffect, useState } from "react";
-import { useMiniSearch } from "react-minisearch";
+import React, { useState, useEffect } from "react";
 import {
-  TextInput,
   View,
-  StyleProp,
-  ViewStyle,
+  TextInput,
+  TouchableOpacity,
   Text,
-  TextInputProps,
+  StyleSheet,
 } from "react-native";
+import { useMiniSearch } from "react-minisearch";
+import sortResultsByPrice from "./sortFunction";
 
+// Defining types of props
 interface SearchBarProps {
   border?: boolean;
-  containerStyles?: StyleProp<ViewStyle>;
-  textInputProps?: TextInputProps;
-  data: readonly any[]; // change this to madatory later
-  onChangeText?: (text: string) => void;
-  onSearchResultsChange: (searchResult: readonly any[] | null) => void;
+  placeholder?: string;
+  data: readonly any[];
+  onSearchResultsChange?: (searchResult: readonly any[] | null) => void;
+  autofocus?: boolean;
 }
 
 export default function SearchBar({
-  border = true,
-  containerStyles,
-  textInputProps,
-  onChangeText,
+  border = false,
+  placeholder = "Search",
   data,
-  onSearchResultsChange
-}: SearchBarProps): JSX.Element {
-  //text introduced in the search bar
-  const [text, setText] = useState<string>("");
+  autofocus = false,
+  onSearchResultsChange,
+}: SearchBarProps) {
+  // State for managing suggestions visibility
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
-  //minisearch engine
-  const { autoSuggest, suggestions, removeAll, addAll, clearSuggestions, search, searchResults, clearSearch } =
-    useMiniSearch(data, {
-      // search through the 'name' field
-      //change this if required
-      fields: ["name"],
-      idField: "id",
-      // allow options of error typing
-      searchOptions: {
-        prefix: true,
-        fuzzy: true,
-      },
-      // same errors
-      autoSuggestOptions: {
-        prefix: true,
-        fuzzy: true,
-      },
-    });
+  // State for saving sorted search results
+  const [sortedSearchResults, setSortedSearchResults] = useState<any[]>([]);
 
-  //update data when changes
+  // MiniSearch hook for handling search functionality
+  const {
+    autoSuggest,
+    suggestions,
+    clearSuggestions,
+    search,
+    searchResults,
+    removeAll,
+    addAll,
+  } = useMiniSearch(data, {
+    fields: ["name"],
+    idField: "id",
+    searchOptions: {
+      prefix: true,
+      fuzzy: true,
+    },
+    autoSuggestOptions: {
+      prefix: true,
+      fuzzy: true,
+    },
+  });
+
+  // State for the text introduced in the searchBar
+  const [searchValue, setSearchValue] = useState("");
+
+  // Show suggestions every time the text changes
+  const onChangeText = (text: string) => {
+    setSearchValue(text);
+    if (!text) {
+      setShowSuggestions(false);
+      clearSuggestions();
+      return;
+    }
+    autoSuggest(text);
+    setShowSuggestions(true);
+  };
+
+  // Search when clicked enter (onBlur) in the searchBar
+  const handleOnBlur = () => {
+    if (searchValue) {
+      clearSuggestions();
+      search(searchValue);
+      setShowSuggestions(false);
+    }
+  };
+
+  // Function to handle pressing on one of the suggestions
+  const handleOnSuggestionPress = (item: any) => {
+    // Save the value
+    setSearchValue(item.suggestion);
+    // Clear the suggestions
+    setShowSuggestions(false);
+    clearSuggestions();
+    // Search for the result
+    search(item.suggestion);
+  };
+
+  // Do something when the results change
   useEffect(() => {
-    removeAll();
+    // Update MiniSearch data when data prop changes
     if (data) {
+      removeAll();
       addAll(data);
     }
   }, [data]);
 
-  //suggest everytime the text changes
+  // Do something when the results change
   useEffect(() => {
-    if (text) autoSuggest(text);
-    else clearSuggestions()
-  }, [text]);
-
-  //update the resultChange to the user
-  useEffect(()=> {
-    onSearchResultsChange(searchResults);
-  }, [searchResults])
-
-  //handle when clicking on the enter button
-  const handleOnBlur = () => {
-    if (!text) return 1;
-    clearSuggestions();
-    //search
-    search(text);
-  };
-
+    // Sort the results by price order
+    if (searchResults) {
+      setSortedSearchResults(sortResultsByPrice(searchResults));
+      onSearchResultsChange && onSearchResultsChange(searchResults);
+    }
+  }, [searchResults]);
 
   return (
-    <View
-      style={[
-        {
-          flex: 1,
-          justifyContent: "center",
-          alignContent: "center",
-          maxHeight: 30,
-          width: 150,
-        },
-        containerStyles,
-      ]}
-    >
-      <TextInput
+    <View>
+      {/* Search bar container */}
+      <View
         style={[
-          border && {
-            borderWidth: 1,
-            borderColor: "black",
-            borderRadius: 10,
-            paddingHorizontal: 10,
+          styles.searchbarView,
+          styles.searchBarMargins,
+          styles.searchBarBackground,
+          border && styles.searchBarBorder,
+          showSuggestions && {
+            borderBottomEndRadius: 0,
+            borderBottomLeftRadius: 0,
+            borderBottomWidth: 0,
           },
         ]}
-        // All other props that the user puts
-        {...textInputProps}
+      >
+        {/* Search bar text input */}
+        <TextInput
+          style={styles.searchBarText}
+          placeholder={placeholder}
+          value={searchValue}
+          onChangeText={onChangeText}
+          blurOnSubmit={true}
+          onBlur={handleOnBlur}
+          onFocus={() => setShowSuggestions(true)}
+          autoFocus={autofocus}
+        />
+      </View>
 
-        onChangeText={(s) => 
-          setText(s)
-        }
-        // When clicked enter
-        onBlur={() => 
-          handleOnBlur() // Your onBlur function
-        }
-      />
-      {/* show suggestions */}
-      {suggestions &&
-        suggestions.map((item) => (
-          <Text key={item.suggestion}>
-            {item.suggestion}
-          </Text>
-        ))}
+      {/* Conditional rendering of line based on showSuggestions */}
+      {showSuggestions && (
+        <View style={[styles.line, { marginHorizontal: 25 }]}></View>
+      )}
+
+      {/* Suggestions container */}
+      {showSuggestions && (
+        <View
+          style={[
+            styles.searchBarMargins,
+            styles.searchBarBackground,
+            styles.searchBarBorder,
+            {
+              borderTopWidth: 0,
+              borderTopStartRadius: 0,
+              borderTopEndRadius: 0,
+              paddingBottom: 5,
+            },
+          ]}
+        >
+          {/* Render suggestions */}
+          {suggestions &&
+            suggestions.map((item) => (
+              <TouchableOpacity
+                style={[styles.suggestionItem]}
+                onPress={() => handleOnSuggestionPress(item)}
+                key={item.suggestion}
+              >
+                <Text style={styles.searchBarText}>{item.suggestion}</Text>
+              </TouchableOpacity>
+            ))}
+        </View>
+      )}
     </View>
   );
 }
+
+// Styles
+const styles = StyleSheet.create({
+  searchbarView: {
+    overflow: "hidden",
+    height: 35,
+    marginTop: 30,
+    borderColor: "black",
+    borderWidth: 1,
+    minWidth: 200,
+  },
+  searchBarBackground: {
+    backgroundColor: "white",
+  },
+  searchBarMargins: {
+    paddingHorizontal: 10,
+    marginHorizontal: 20,
+  },
+  searchBarBorder: {
+    borderColor: "black",
+    borderWidth: 1,
+    borderRadius: 7,
+  },
+  searchBarText: {
+    flex: 1,
+    fontSize: 16,
+    color: "black",
+  },
+  line: { borderBottomWidth: 0.2, borderColor: "grey" },
+  suggestionItem: {
+    height: 20,
+  },
+});
