@@ -4,22 +4,24 @@ import Akcijos from "./Akcijos";
 import SearchBar from "./SearchBar";
 
 export default function App() {
-  const [text, setText] = useState<string>("");
   const [searchResult, setSearchResult] = useState<readonly any[] | null>();
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* SearchBar */}
       <SearchBar
         border={true}
         placeholder="Search"
         data={Akcijos}
         onSearchResultsChange={(result) => setSearchResult(result)}
       />
+      {/* Render search results */}
       <ScrollView contentContainerStyle={styles.resultContainer}>
         {searchResult?.map((item) => (
-          <Text key={item.id} style={styles.resultItem}>
-            {item.name}
-          </Text>
+          <View style={styles.resultItemView} key={item.id}>
+            <Text style={styles.resultItemText}>{item.name}</Text>
+            <Text style={{ color: "red" }}>{item.price}</Text>
+          </View>
         ))}
       </ScrollView>
     </SafeAreaView>
@@ -36,8 +38,7 @@ const styles = StyleSheet.create({
   resultContainer: {
     flex: 1,
     marginTop: 20,
-    // borderColor: "black",
-    // borderWidth: 1,
   },
-  resultItem: {},
+  resultItemView: { flexDirection: "row" },
+  resultItemText: { marginHorizontal: 10 },
 });
