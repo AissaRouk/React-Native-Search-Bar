@@ -5,6 +5,9 @@ import {
   TouchableOpacity,
   Text,
   StyleSheet,
+  StyleProp,
+  ViewStyle,
+  TextStyle,
 } from "react-native";
 import { useMiniSearch } from "react-minisearch";
 import sortResultsByPrice from "./sortFunction";
@@ -16,6 +19,20 @@ interface SearchBarProps {
   data: readonly any[];
   onSearchResultsChange?: (searchResult: readonly any[] | null) => void;
   autofocus?: boolean;
+
+  // Additional customization props
+  backgroundColor?: string;
+  textColor?: string;
+  borderColor?: string;
+  borderWidth?: number;
+  borderRadius?: number;
+  placeholderTextColor?: string;
+  inputStyle?: StyleProp<TextStyle>;
+  suggestionBoxStyle?: StyleProp<ViewStyle>;
+  fontSize?: number;
+  clearIcon?: React.ReactNode;
+  onFocus?: () => void;
+  onBlur?: () => void;
 }
 
 export default function SearchBar({
@@ -24,6 +41,18 @@ export default function SearchBar({
   data,
   autofocus = false,
   onSearchResultsChange,
+  backgroundColor = "white",
+  textColor = "black",
+  borderColor = "black",
+  borderWidth = 1,
+  borderRadius = 7,
+  placeholderTextColor = "grey",
+  inputStyle,
+  suggestionBoxStyle,
+  fontSize = 16,
+  clearIcon,
+  onFocus,
+  onBlur,
 }: SearchBarProps) {
   // State for managing suggestions visibility
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -74,6 +103,7 @@ export default function SearchBar({
       clearSuggestions();
       search(searchValue);
       setShowSuggestions(false);
+      onBlur && onBlur();
     }
   };
 
@@ -120,19 +150,41 @@ export default function SearchBar({
             borderBottomLeftRadius: 0,
             borderBottomWidth: 0,
           },
+          {
+            backgroundColor: backgroundColor,
+            borderColor: borderColor,
+            borderWidth: borderWidth,
+            borderRadius: borderRadius,
+          },
         ]}
       >
         {/* Search bar text input */}
         <TextInput
-          style={styles.searchBarText}
+          style={[
+            styles.searchBarText,
+            inputStyle,
+            { color: textColor, fontSize: fontSize },
+          ]}
           placeholder={placeholder}
+          placeholderTextColor={placeholderTextColor}
           value={searchValue}
           onChangeText={onChangeText}
           blurOnSubmit={true}
-          onBlur={handleOnBlur}
-          onFocus={() => setShowSuggestions(true)}
+          onBlur={() => {
+            handleOnBlur();
+          }}
+          onFocus={() => {
+            setShowSuggestions(true);
+            onFocus && onFocus();
+          }}
           autoFocus={autofocus}
         />
+        {/* Clear icon */}
+        {clearIcon && (
+          <TouchableOpacity onPress={() => setSearchValue("")}>
+            {clearIcon}
+          </TouchableOpacity>
+        )}
       </View>
 
       {/* Conditional rendering of line based on showSuggestions */}
@@ -147,6 +199,7 @@ export default function SearchBar({
             styles.searchBarMargins,
             styles.searchBarBackground,
             styles.searchBarBorder,
+            suggestionBoxStyle,
             {
               borderTopWidth: 0,
               borderTopStartRadius: 0,
@@ -163,7 +216,9 @@ export default function SearchBar({
                 onPress={() => handleOnSuggestionPress(item)}
                 key={item.suggestion}
               >
-                <Text style={styles.searchBarText}>{item.suggestion}</Text>
+                <Text style={[styles.searchBarText, { fontSize: fontSize }]}>
+                  {item.suggestion}
+                </Text>
               </TouchableOpacity>
             ))}
         </View>
@@ -181,6 +236,9 @@ const styles = StyleSheet.create({
     borderColor: "black",
     borderWidth: 1,
     minWidth: 200,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   searchBarBackground: {
     backgroundColor: "white",
@@ -190,13 +248,10 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
   },
   searchBarBorder: {
-    borderColor: "black",
-    borderWidth: 1,
     borderRadius: 7,
   },
   searchBarText: {
     flex: 1,
-    fontSize: 16,
     color: "black",
   },
   line: { borderBottomWidth: 0.2, borderColor: "grey" },
