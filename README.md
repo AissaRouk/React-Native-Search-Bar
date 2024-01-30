@@ -1,4 +1,4 @@
-###React Native SearchBar Component
+#React Native SearchBar Component
 
 A simple and customizable search bar component for React Native.
 Overview
