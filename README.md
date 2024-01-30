@@ -62,3 +62,4 @@ export default YourComponent;
 - **clearIcon** (optional): Custom component to clear the search input.
 - **onFocus** (optional): Callback function triggered when the search bar gains focus.
 - **onBlur** (optional): Callback function triggered when the search bar loses focus.
+
