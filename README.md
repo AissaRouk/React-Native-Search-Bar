@@ -1,4 +1,4 @@
-#React Native SearchBar Component
+# React Native SearchBar Component
 
 A simple and customizable search bar component for React Native.
 Overview
@@ -6,17 +6,18 @@ Overview
 The SearchBar component provides a flexible search input with suggestions for React Native applications. It's designed to be easily integrated into your project, allowing users to perform searches efficiently.
 Features
 
-    Search Suggestions: Display suggestions as the user types for a user-friendly experience.
-    Customizable: Easily customize the appearance of the search bar to match your app's design.
-    Search Result Handling: Retrieve and handle search results effortlessly.
+- Search Suggestions: Display suggestions as the user types for a user-friendly experience.
+- Customizable: Easily customize the appearance of the search bar to match your app's design.
+- Search Result Handling: Retrieve and handle search results effortlessly.
 
-How to Use
-Installation
+## How to Use
+
+### Installation
 
 Copy and paste the contents of SearchBar.tsx into your React Native project.
 Basic Usage
 
-jsx
+```jsx
 
 import React, { useState } from 'react';
 import { View, Text } from 'react-native';
@@ -39,7 +40,7 @@ const YourComponent = () => {
   );
 };
 
-export default YourComponent;
+export default YourComponent;```
 
 Props
 
