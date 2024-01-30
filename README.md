@@ -40,24 +40,25 @@ const YourComponent = () => {
   );
 };
 
-export default YourComponent;```
+export default YourComponent;
+```
 
-Props
+### Props
 
-    border (optional, default: false): Show/hide the border around the search bar.
-    placeholder (optional, default: "Search"): Placeholder text for the search bar.
-    data (required): An array of data to search through.
-    onSearchResultsChange (optional): Callback function triggered when search results change.
-    autofocus (optional, default: false): Autofocus the search bar on component mount.
-    backgroundColor (optional, default: "white"): Background color of the search bar.
-    textColor (optional, default: "black"): Text color of the search bar.
-    borderColor (optional, default: "black"): Border color of the search bar.
-    borderWidth (optional, default: 1): Border width of the search bar.
-    borderRadius (optional, default: 7): Border radius of the search bar.
-    placeholderTextColor (optional, default: "grey"): Text color of the placeholder.
-    inputStyle (optional): Additional style for the input.
-    suggestionBoxStyle (optional): Additional style for the suggestion box.
-    fontSize (optional, default: 16): Font size of the text in the search bar.
-    clearIcon (optional): Custom component to clear the search input.
-    onFocus (optional): Callback function triggered when the search bar gains focus.
-    onBlur (optional): Callback function triggered when the search bar loses focus.
+- border (optional, default: false): Show/hide the border around the search bar.
+- placeholder (optional, default: "Search"): Placeholder text for the search bar.
+- data (required): An array of data to search through.
+- onSearchResultsChange (optional): Callback function triggered when search results change.
+- autofocus (optional, default: false): Autofocus the search bar on component mount.
+- backgroundColor (optional, default: "white"): Background color of the search bar.
+- textColor (optional, default: "black"): Text color of the search bar.
+- borderColor (optional, default: "black"): Border color of the search bar.
+- borderWidth (optional, default: 1): Border width of the search bar.
+- borderRadius (optional, default: 7): Border radius of the search bar.
+- placeholderTextColor (optional, default: "grey"): Text color of the placeholder.
+- inputStyle (optional): Additional style for the input.
+- suggestionBoxStyle (optional): Additional style for the suggestion box.
+- fontSize (optional, default: 16): Font size of the text in the search bar.
+- clearIcon (optional): Custom component to clear the search input.
+- onFocus (optional): Callback function triggered when the search bar gains focus.
+- onBlur (optional): Callback function triggered when the search bar loses focus.
