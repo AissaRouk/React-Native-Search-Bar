@@ -55,10 +55,7 @@ export default function SearchBar({
   onBlur,
 }: SearchBarProps) {
   // State for managing suggestions visibility
-  const [showSuggestions, setShowSuggestions] = useState(false);
-
-  // State for saving sorted search results
-  const [sortedSearchResults, setSortedSearchResults] = useState<any[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
 
   // MiniSearch hook for handling search functionality
   const {
@@ -131,7 +128,6 @@ export default function SearchBar({
   useEffect(() => {
     // Sort the results by price order
     if (searchResults) {
-      setSortedSearchResults(sortResultsByPrice(searchResults));
       onSearchResultsChange && onSearchResultsChange(searchResults);
     }
   }, [searchResults]);
@@ -200,11 +196,12 @@ export default function SearchBar({
             styles.searchBarBackground,
             styles.searchBarBorder,
             suggestionBoxStyle,
-            {
+            showSuggestions && {
               borderTopWidth: 0,
               borderTopStartRadius: 0,
               borderTopEndRadius: 0,
               paddingBottom: 5,
+              // flex: 1,
             },
           ]}
         >
@@ -249,6 +246,8 @@ const styles = StyleSheet.create({
   },
   searchBarBorder: {
     borderRadius: 7,
+    borderWidth: 1,
+    borderColor: "black",
   },
   searchBarText: {
     flex: 1,
